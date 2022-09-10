@@ -1,5 +1,9 @@
 import React, { Component } from 'react';
-import axios from 'axios';
+//import axios from 'axios';
+//import Dashboard from '../Dashboard';
+import {createWallet} from '../../../actions/projectActions'
+import {connect} from 'react-redux'
+
 class CreateWallet extends Component {
 
     constructor(props) {
@@ -11,6 +15,9 @@ class CreateWallet extends Component {
             description: '',
             priority: ''
         }
+    }
+    UNSAFE_componentWillReceiveProps(nextProps) {
+        this.setState({errors:nextProps.errors})
     }
 
     changeHandler = (event, fieldName) => {
@@ -26,11 +33,7 @@ class CreateWallet extends Component {
             description: this.state.description,
             priority: this.state.priority
         }
-        axios.post('http://localhost:8081/wallet', newWallet).then((res) => {
-              alert("success");
-        }).catch((err) => {
-             alert("error");
-        })
+       this.props.createWallet(newWallet)
         event.preventDefault();
 
     }
@@ -45,14 +48,17 @@ class CreateWallet extends Component {
                             <form onSubmit={(event)=>this.submitHandler(event)}>
                                 <div className="form-group">
                                     <input type="text" className="form-control form-control-lg " onChange={(event) => this.changeHandler(event, "name")} placeholder="Account Name" />
+                                    <p className="text-danger">{this.props.errors.name}</p>
                                 </div>
                                 <br></br>
                                 <div className="form-group">
                                     <input type="text" className="form-control form-control-lg" onChange={(event) => this.changeHandler(event, "accountNumber")} placeholder="Account No" />
+                                    <p className="text-danger">{this.props.errors.accountNumber}</p>
                                 </div>
                                 <br></br>
                                 <div className="form-group">
                                     <textarea className="form-control form-control-lg" onChange={(event) => this.changeHandler(event, "description")} placeholder="Description"></textarea>
+                                    <p className="text-danger">{this.props.errors.description}</p>
                                 </div>
                                 <br></br>
                                 <div className="form-group">
@@ -74,4 +80,8 @@ class CreateWallet extends Component {
     }
 }
 
-export default CreateWallet;
+const mapStateToProps = (state) => ({
+   errors:state.errors
+})
+
+export default connect(mapStateToProps,{createWallet})(CreateWallet);
